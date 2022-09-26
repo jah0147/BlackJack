@@ -87,7 +87,7 @@ bool game::playGame() {
                     dealerBlackJack = true;
                 }
                 else {
-                    while ((dealerCardTotalHigh < 17 && dealerCardTotalHigh < playerBestHand) && !dealerBust) {
+                    while ((dealerCardTotalHigh < 17 && (dealerCardTotalHigh <= playerBestHand)) && !dealerBust) {
                         hideDealerCard2 = false;
                         console.gameUI(GAMEUI, playerCardTotalHigh, playerCardTotalLow,
                                        dealerCardTotalHigh, dealerCardTotalLow,

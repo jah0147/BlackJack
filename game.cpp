@@ -342,9 +342,9 @@ bool game::checkForBust(int who) {
             playerCardTotalHigh = caclulateCardTotal(HIGH, playerHand);
             playerCardTotalLow = caclulateCardTotal(LOW, playerHand);
 
-            if (playerCardTotalHigh > 22)
+            if (playerCardTotalHigh > 21)
             {
-                if (playerCardTotalLow > 22)
+                if (playerCardTotalLow > 21)
                 {
                     bust = true;
                 }
@@ -361,9 +361,9 @@ bool game::checkForBust(int who) {
             dealerCardTotalHigh = caclulateCardTotal(HIGH, dealerHand);
             dealerCardTotalLow = caclulateCardTotal(LOW, dealerHand);
 
-            if (dealerCardTotalHigh > 22)
+            if (dealerCardTotalHigh > 21)
             {
-                if (dealerCardTotalLow > 22)
+                if (dealerCardTotalLow > 21)
                 {
                     bust = true;
                 }
@@ -421,7 +421,8 @@ void game::calculateWinner() {
     if (playerBestHand == dealerBestHand)
     {
         tie = true;
-    } else if (playerBestHand > dealerBestHand)
+    }
+    else if (playerBestHand > dealerBestHand)
     {
         playerWon = true;
     } else {

@@ -28,8 +28,8 @@ void console::welcomeMsg() {
  */
 void console::printArt() {
     std::string line; //string that holds the line of a text file
-    //std::ifstream textFile("textFiles/art/art.txt", std::ios::in); //file creation
-    std::ifstream textFile("art.txt", std::ios::in); //file creation
+    std::ifstream textFile("textFiles/art/art.txt", std::ios::in); //file creation
+    //std::ifstream textFile("art.txt", std::ios::in); //file creation
 
     if(textFile.is_open()) //checking if file was opened
     {

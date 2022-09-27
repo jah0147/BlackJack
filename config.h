@@ -9,5 +9,6 @@
 #define ClearConsole //comment out if you do not want the console messages to ever clear
 #define DELAY //comment out if you want to disable delays (this may break some game functionality)
 #define SPASHSCREEN //comment out if you do not want to see the text spash screen at the begining
+#define DoubleDown //comment out to remove double down functionality from game
 
 #endif //BLACKJACK_CONFIG_H

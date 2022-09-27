@@ -48,35 +48,62 @@ bool game::playGame() {
                 console.gameUI(GAMEUI, playerCardTotalHigh, playerCardTotalLow,
                                         dealerCardTotalHigh, dealerCardTotalLow,
                                         playerHand, dealerHand);
+
                 int userInput;
-                cout << "[1] HIT" << endl;
-                cout << "[2] STAY" << endl;
-                cout << "\nInput" << endl;
-                cin >> userInput;
-                switch (userInput)
-                {
-                    case HIT:
-                        hit(PLAYER);
-                        playerBust = checkForBust(PLAYER);
-                        break;
+                #ifdef DoubleDown
+                for (int i = 0; i < 1; i++) {
+                    cout << "[1] HIT" << endl;
+                    cout << "[2] STAY" << endl;
+                    cout << "[3] DOUBLE DOWN" << endl;
+                    cout << "\nInput" << endl;
+                    cin >> userInput;
 
-                    case STAY:
-                        bStay = true;
-                        hideDealerCard2 = false;
-                        break;
 
-                        //not implimented yet
-//                            case DOUBLEDOWN:
-//                                //doubleDown();
-//                                break;
-//
-//                            case SPLIT:
-//                                //split();
-//                                break;
+                    switch (userInput) {
+                        case HIT:
+                            hit(PLAYER);
+                            playerBust = checkForBust(PLAYER);
+                            break;
 
-                    default:
-                        cout << "[ERROR] In playGame switch statement";
-                        break;
+                        case DOUBLEDOWN:
+                            chipBalance -= playerBet;
+                            playerBet += playerBet;
+                            hit(PLAYER);
+                            bStay = true;
+                            break;
+
+                        case STAY:
+                            bStay = true;
+                            hideDealerCard2 = false;
+                            break;
+
+                        default:
+                            cout << "[ERROR] In playGame switch statement";
+
+                    }
+                }
+                #endif
+                if (!bStay) {
+                    cout << "[1] HIT" << endl;
+                    cout << "[2] STAY" << endl;
+                    //cout << "[3] DOUBLE DOWN" << endl;
+                    cout << "\nInput" << endl;
+                    cin >> userInput;
+                    switch (userInput) {
+                        case HIT:
+                            hit(PLAYER);
+                            playerBust = checkForBust(PLAYER);
+                            break;
+
+                        case STAY:
+                            bStay = true;
+                            hideDealerCard2 = false;
+                            break;
+
+                        default:
+                            cout << "[ERROR] In playGame switch statement";
+                            break;
+                    }
                 }
             }
             if (!playerBust) //If user did not bust

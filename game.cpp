@@ -51,35 +51,37 @@ bool game::playGame() {
 
                 int userInput;
                 #ifdef DoubleDown
-                for (int i = 0; i < 1; i++) {
-                    cout << "[1] HIT" << endl;
-                    cout << "[2] STAY" << endl;
-                    cout << "[3] DOUBLE DOWN" << endl;
-                    cout << "\nInput" << endl;
-                    cin >> userInput;
+                if (chipBalance >= playerBet) {
+                    for (int i = 0; i < 1; i++) {
+                        cout << "[1] HIT" << endl;
+                        cout << "[2] STAY" << endl;
+                        cout << "[3] DOUBLE DOWN" << endl;
+                        cout << "\nInput" << endl;
+                        cin >> userInput;
 
 
-                    switch (userInput) {
-                        case HIT:
-                            hit(PLAYER);
-                            playerBust = checkForBust(PLAYER);
-                            break;
+                        switch (userInput) {
+                            case HIT:
+                                hit(PLAYER);
+                                playerBust = checkForBust(PLAYER);
+                                break;
 
-                        case DOUBLEDOWN:
-                            chipBalance -= playerBet;
-                            playerBet += playerBet;
-                            hit(PLAYER);
-                            bStay = true;
-                            break;
+                            case DOUBLEDOWN:
+                                chipBalance -= playerBet;
+                                playerBet += playerBet;
+                                hit(PLAYER);
+                                bStay = true;
+                                break;
 
-                        case STAY:
-                            bStay = true;
-                            hideDealerCard2 = false;
-                            break;
+                            case STAY:
+                                bStay = true;
+                                hideDealerCard2 = false;
+                                break;
 
-                        default:
-                            cout << "[ERROR] In playGame switch statement";
+                            default:
+                                cout << "[ERROR] In playGame switch statement";
 
+                        }
                     }
                 }
                 #endif

@@ -8,6 +8,7 @@ int main() {
     game game;
 
     bool Continue = true;
+
 #ifdef SPASHSCREEN
     console.printArt();
     console.welcomeMsg();

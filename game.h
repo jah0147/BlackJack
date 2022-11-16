@@ -22,6 +22,8 @@ public:
     void initialDeal();
     int caclulateCardTotal(int highLow, vector<int> hand);
     bool checkForBust(int who);
+    void playerTurn();
+    void dealerTurn();
     //may use these to simplify game code
     //void playerTurn();
     //void dealerTurn();
@@ -47,9 +49,14 @@ private:
     unsigned int playerBetTemp; //temp value to verify userBet
 
     vector<int> playerHand; //technically the max amount of cards you could draw is 21
+    vector<int> playerHandSplit; //players second hand if they choose to split
     vector<int> dealerHand; //technically the max amount of cards you could draw is 21
     int playerCardTotalHigh = 0;
+    int playerCardTotalHighSplit = 0;
     int playerCardTotalLow = 0; //In the event of an ace
+    int playerCardTotalLowSplit = 0; //In the event of an ace
+    int playerCardTotalSplitHigh = 0;
+    int playerCardTotalSplitLow = 0;
     int dealerCardTotalHigh = 0;
     int dealerCardTotalLow = 0;
 
@@ -60,9 +67,13 @@ private:
     bool dealerBust = false;
     bool playerBlackJack = false;
     bool dealerBlackJack = false;
+    bool bSplit = false;
+    bool bSplitTurn = false;
     bool bStay = false;
     bool playerWon = false;
     bool tie = false;
+
+    bool playerTurn2 = false;
 
     enum gameEnums
     {
@@ -85,7 +96,8 @@ private:
     enum Who
     {
         PLAYER = 1,
-        DEALER = 2
+        DEALER = 2,
+        SPLITHAND = 3
     };
 };
 

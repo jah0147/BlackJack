@@ -11,9 +11,13 @@ bool game::playGame() {
     //initialize values
     Continue = true;
     playerHand.clear(); //technically the max amount of cards you could draw is 21
+    playerHandSplit.clear();
     dealerHand.clear(); //technically the max amount of cards you could draw is 21
     playerCardTotalHigh = 0;
     playerCardTotalLow = 0; //In the event of an ace
+    playerCardTotalLowSplit = 0;
+    playerCardTotalSplitHigh = 0;
+    playerCardTotalSplitLow = 0;
     dealerCardTotalHigh = 0;
     dealerCardTotalLow = 0;
     playerBestHand = 0;
@@ -22,16 +26,21 @@ bool game::playGame() {
     dealerBust = false;
     playerBlackJack = false;
     dealerBlackJack = false;
+    bSplit = false;
+    bSplitTurn = false;
     bStay = false;
     playerWon = false;
     tie = false;
+    playerTurn2 = false;
 
     if (chipBalance > 0)
     {
         bet();
         initialDeal();
         playerCardTotalHigh = caclulateCardTotal(HIGH, playerHand);
+        //playerCardTotalHighSplit = caclulateCardTotal(HIGH, playerHand);
         playerCardTotalLow = caclulateCardTotal(LOW, playerHand);
+        //playerCardTotalLowSplit = caclulateCardTotal(LOW, playerHandSplit);
         dealerCardTotalHigh = caclulateCardTotal(HIGH, dealerHand);
         dealerCardTotalLow = caclulateCardTotal(LOW, dealerHand);
 
@@ -49,99 +58,30 @@ bool game::playGame() {
                                         dealerCardTotalHigh, dealerCardTotalLow,
                                         playerHand, dealerHand);
 
-                int userInput;
-                #ifdef DoubleDown
-                if (chipBalance >= playerBet) {
-                    for (int i = 0; i < 1; i++) {
-                        cout << "[1] HIT" << endl;
-                        cout << "[2] STAY" << endl;
-                        cout << "[3] DOUBLE DOWN" << endl;
-                        cout << "\nInput" << endl;
-                        cin >> userInput;
+                playerTurn();
+                playerTurn2 = true;
+            }
+            if (bSplit)
+            {
+                while (((playerCardTotalLowSplit < 21)) && (!bStay) && (!playerBust))
+                {
+                    bSplitTurn = true;
+                    //print here and get user input
+                    console.gameUI(GAMEUI, playerCardTotalHighSplit, playerCardTotalLowSplit,
+                                   dealerCardTotalHigh, dealerCardTotalLow,
+                                   playerHand, dealerHand);
 
-
-                        switch (userInput) {
-                            case HIT:
-                                hit(PLAYER);
-                                playerBust = checkForBust(PLAYER);
-                                break;
-
-                            case DOUBLEDOWN:
-                                chipBalance -= playerBet;
-                                playerBet += playerBet;
-                                hit(PLAYER);
-                                bStay = true;
-                                break;
-
-                            case STAY:
-                                bStay = true;
-                                hideDealerCard2 = false;
-                                break;
-
-                            default:
-                                cout << "[ERROR] In playGame switch statement";
-
-                        }
-                    }
+                    playerTurn();
                 }
-                #endif
-                if (!bStay) {
-                    cout << "[1] HIT" << endl;
-                    cout << "[2] STAY" << endl;
-                    //cout << "[3] DOUBLE DOWN" << endl;
-                    cout << "\nInput" << endl;
-                    cin >> userInput;
-                    switch (userInput) {
-                        case HIT:
-                            hit(PLAYER);
-                            playerBust = checkForBust(PLAYER);
-                            break;
 
-                        case STAY:
-                            bStay = true;
-                            hideDealerCard2 = false;
-                            break;
 
-                        default:
-                            cout << "[ERROR] In playGame switch statement";
-                            break;
-                    }
-                }
             }
             if (!playerBust) //If user did not bust
             {
-                calculateWinner(); //used for generating player best hand
-                if (dealerCardTotalHigh == 21)
-                {
-                    dealerBlackJack = true;
-                }
-                else {
-                    while ((dealerCardTotalHigh < 17 && (dealerCardTotalHigh <= playerBestHand)) && !dealerBust) {
-                        hideDealerCard2 = false;
-                        console.gameUI(GAMEUI, playerCardTotalHigh, playerCardTotalLow,
-                                       dealerCardTotalHigh, dealerCardTotalLow,
-                                       playerHand, dealerHand);
-                        hit(DEALER);
-                        console.delayInSec(1);
-                        dealerBust = checkForBust(DEALER);
-                    }
-                    if (dealerCardTotalHigh > 21)
-                    {
-                        while (dealerCardTotalLow < 17) {
-                            hit(DEALER);
-                            console.delayInSec(1);
-                            dealerBust = checkForBust(DEALER);
-                        }
-                    }
-                    if (dealerBust) {
-                        console.bust(DEALER);
-                        playerWon = true;
-                    } else {
-                        calculateWinner();
-                    }
-                }
+                dealerTurn();
             }
             else {
+                console.bust(PLAYER);
                 playerWon = false;
             }
         }
@@ -337,12 +277,23 @@ void game::hit(int who) {
     switch (who)
     {
         case PLAYER:
-            playerHand.push_back(card);
-            playerCardTotalHigh = caclulateCardTotal(HIGH, playerHand);
-            playerCardTotalLow = caclulateCardTotal(LOW, playerHand);
-            console.gameUI(GAMEUI,
-                           playerCardTotalHigh, playerCardTotalLow,
-                           dealerCardTotalHigh, dealerCardTotalLow, playerHand, dealerHand);
+            if (!bSplitTurn)
+            {
+                playerHand.push_back(card);
+                playerCardTotalHigh = caclulateCardTotal(HIGH, playerHand);
+                playerCardTotalLow = caclulateCardTotal(LOW, playerHand);
+                console.gameUI(GAMEUI,
+                               playerCardTotalHigh, playerCardTotalLow,
+                               dealerCardTotalHigh, dealerCardTotalLow, playerHand, dealerHand);
+            } else
+            { //if we are on split hand
+                playerHandSplit.push_back(card);
+                playerCardTotalHighSplit = caclulateCardTotal(HIGH, playerHandSplit);
+                playerCardTotalLowSplit = caclulateCardTotal(LOW, playerHandSplit);
+                console.gameUI(GAMEUI,
+                               playerCardTotalHighSplit, playerCardTotalLowSplit,
+                               dealerCardTotalHigh, dealerCardTotalLow, playerHandSplit, dealerHand);
+            }
             break;
         case DEALER:
             dealerHand.push_back(card);
@@ -351,7 +302,14 @@ void game::hit(int who) {
             console.gameUI(GAMEUI,
                            playerCardTotalHigh, playerCardTotalLow,
                            dealerCardTotalHigh, dealerCardTotalLow, playerHand, dealerHand);
+            if (bSplit)
+            {
+                console.gameUI(GAMEUI,
+                               playerCardTotalHighSplit, playerCardTotalLowSplit,
+                               dealerCardTotalHigh, dealerCardTotalLow, playerHandSplit, dealerHand);
+            }
             break;
+
         default:
             cout << "[ERROR] In game.hit()";
             break;
@@ -368,22 +326,35 @@ bool game::checkForBust(int who) {
     switch (who)
     {
         case PLAYER:
-            playerCardTotalHigh = caclulateCardTotal(HIGH, playerHand);
-            playerCardTotalLow = caclulateCardTotal(LOW, playerHand);
+            if (!bSplitTurn) {
+                playerCardTotalHigh = caclulateCardTotal(HIGH, playerHand);
+                playerCardTotalLow = caclulateCardTotal(LOW, playerHand);
 
-            if (playerCardTotalHigh > 21)
-            {
-                if (playerCardTotalLow > 21)
-                {
-                    bust = true;
-                }
-                else
-                {
+
+                if (playerCardTotalHigh > 21) {
+                    if (playerCardTotalLow > 21) {
+                        bust = true;
+                    } else {
+                        bust = false;
+                    }
+                } else {
                     bust = false;
                 }
-            }
-            else {
-                bust = false;
+            } else
+            {
+                playerCardTotalHighSplit = caclulateCardTotal(HIGH, playerHandSplit);
+                playerCardTotalLowSplit = caclulateCardTotal(LOW, playerHandSplit);
+
+
+                if (playerCardTotalHighSplit > 21) {
+                    if (playerCardTotalLowSplit > 21) {
+                        bust = true;
+                    } else {
+                        bust = false;
+                    }
+                } else {
+                    bust = false;
+                }
             }
             break;
         case DEALER:
@@ -412,6 +383,124 @@ bool game::checkForBust(int who) {
     return bust;
 }
 
+void game::playerTurn() {
+    int userInput = 0;
+                cout << "[1] HIT" << endl;
+                cout << "[2] STAY" << endl;
+#ifdef DoubleDown
+                if (chipBalance >= playerBet)
+                {
+                    if (!playerTurn2)
+                    {
+                        cout << "[3] DOUBLE DOWN" << endl;
+                    }
+                }
+#endif
+#ifdef Split
+                if (playerHand[0] == playerHand[1]) {
+                    if (!playerTurn2)
+                    {
+                        if (chipBalance >= playerBet)
+                        {
+                            cout << "[4] SPLIT" << endl;
+                        }
+                    }
+                    }
+#endif
+                cout << "\nInput" << endl;
+                cin >> userInput;
+                int tempHand1 = 0;
+                switch (userInput) {
+                    case HIT:
+                        hit(PLAYER);
+                        playerBust = checkForBust(PLAYER); //check if bust
+                        break;
+
+                    case STAY:
+                        bStay = true;
+                        hideDealerCard2 = false;
+                        break;
+#ifdef DoubleDown
+                    case DOUBLEDOWN:
+                        if (chipBalance >= chipBalance)
+                        {
+                            if (!playerTurn2) {
+                                chipBalance -= playerBet;
+                                playerBet += playerBet;
+                                hit(PLAYER);
+                                playerBust = checkForBust(PLAYER); //check if bust
+                                bStay = true;
+                            }
+                            else
+                            {
+                                cout << "CANNOT DOUBLE DOWN" << endl;
+                            }
+                        }
+                        break;
+#endif
+
+                    case SPLIT:
+                        if (!bSplit) {
+                            if (playerHand[0] == playerHand[1]) {
+                                if (!playerTurn2) {
+                                    bSplit = true;
+                                    tempHand1 = playerHand[0];
+                                    playerHand.clear();
+                                    playerHandSplit.clear();
+                                    playerHand.push_back(tempHand1);
+                                    playerHandSplit.push_back(tempHand1);
+                                } else {
+                                    cout << "CANNOT SPLIT" << endl;
+                                }
+                            }else {
+                                cout << "CANNOT SPLIT" << endl;
+                            }
+                        } else
+                        {
+                            cout << "CANNOT SPLIT" << endl;
+                        }
+                        break;
+
+                    default:
+                        cout << "[ERROR] In playGame switch statement";
+                        break;
+                }
+}
+
+void game::dealerTurn() {
+    calculateWinner(); //used for generating player best hand
+    hideDealerCard2 = false;
+    console.gameUI(GAMEUI, playerCardTotalHigh, playerCardTotalLow,
+                   dealerCardTotalHigh, dealerCardTotalLow,
+                   playerHand, dealerHand);
+    if (dealerCardTotalHigh == 21)
+    {
+        dealerBlackJack = true;
+    }
+    else {
+        while ((dealerCardTotalHigh < 17 && (dealerCardTotalHigh <= playerBestHand)) && !dealerBust) {
+            hit(DEALER);
+            console.delayInSec(1);
+            dealerBust = checkForBust(DEALER);
+        }
+        if (dealerCardTotalHigh > 21)
+        {
+            while (dealerCardTotalLow < 17) {
+                hit(DEALER);
+                console.delayInSec(1);
+                dealerBust = checkForBust(DEALER);
+            }
+        }
+        if (dealerBust) {
+            console.bust(DEALER);
+            calculateWinner(); //for math-ing
+            playerWon = true;
+        } else {
+            calculateWinner();
+        }
+    }
+}
+
 void game::payPlayer() {
     if (tie)
     {
@@ -423,7 +512,7 @@ void game::payPlayer() {
     }
     else if (playerBlackJack && !dealerBlackJack)
     {
-        chipBalance += (playerBet * 3); //double players bet
+        chipBalance += (playerBet * 3); //tripple players bet
     }
     else if (playerWon)
     {

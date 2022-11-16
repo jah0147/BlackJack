@@ -131,7 +131,7 @@ void console::gameUI(int UI,
 #ifdef ClearConsole
             clearConsole();
 #endif
-            cout << "-------------------------------------------------------------------" << endl;
+            cout << "===================================================================" << endl;
             cout << "Dealers Hand: ";
             if (hideDealerCard2) { //this value is changed outside the class
                 cout << " ";
@@ -148,17 +148,19 @@ void console::gameUI(int UI,
                 cout << endl;
                 cout << endl;
                 if (dealerTotalHigh == dealerTotalLow) {
-                    cout << "Dealers card total: " << dealerTotalHigh;
+                    cout << "Dealers card total: " << dealerTotalHigh << endl;
                 }
                 else if (dealerTotalHigh <= 21) {
                     cout << "Dealers card total: " << dealerTotalHigh << " or " << dealerTotalLow << endl;
                 } else {
-                    cout << "Dealers card total: " << dealerTotalLow;
+                    cout << "Dealers card total: " << dealerTotalLow << endl;
                 }
             }
             //spacing
-            cout << endl;
-            cout << endl;
+            cout << "" << endl;
+            cout << "-------------------------------------------------------------------" << endl;
+            cout << "" << endl;
+
             cout << "Your Hand: ";
             for (int i = 0; i < playerHand.size(); i++)
             {
@@ -166,8 +168,8 @@ void console::gameUI(int UI,
                 cout << "[" << playerHand[i] << "]";
             }
             //spacing
-            cout << endl;
-            cout << endl;
+            cout << "" << endl;
+            cout << ""<< endl;
 
             if (playerTotalHigh == playerTotalLow) {
                 cout << "Your card total: " << playerTotalHigh;
@@ -179,7 +181,7 @@ void console::gameUI(int UI,
             }
             cout << endl;
             cout <<  "\nChip Balance: " << chipBalance << endl;
-            cout << "-------------------------------------------------------------------" << endl;
+            cout << "===================================================================" << endl;
             break;
         default:
             cout << "[ERROR] In game UI" << endl;
@@ -192,11 +194,11 @@ void console::displayResults(int dealerTotal, int playerTotal, bool won)
 //#ifdef ClearConsole
 //    clearConsole();
 //#endif
-    cout << "-------------------------------------------------------------------" << endl;
+    cout << "===================================================================" << endl;
     cout << "                DEALERS CARD TOTAL: " << dealerTotal << endl;
     cout << endl;
     cout << "                 YOUR CARD TOTAL: " << playerTotal << endl;
-    cout << "-------------------------------------------------------------------" << endl;
+    cout << "===================================================================" << endl;
     cout << endl;
     if (won) {
         cout <<             "       YOU WON!" << endl;

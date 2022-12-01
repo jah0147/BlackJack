@@ -63,6 +63,7 @@ bool game::playGame() {
             }
             if (bSplit)
             {
+                bStay = false;
                 while (((playerCardTotalLowSplit < 21)) && (!bStay) && (!playerBust))
                 {
                     bSplitTurn = true;

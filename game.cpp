@@ -21,8 +21,10 @@ bool game::playGame() {
     dealerCardTotalHigh = 0;
     dealerCardTotalLow = 0;
     playerBestHand = 0;
+    playerBestHandSplit = 0;
     dealerBestHand = 0;
     playerBust = false;
+    playerBustSplit = false;
     dealerBust = false;
     playerBlackJack = false;
     dealerBlackJack = false;
@@ -30,6 +32,7 @@ bool game::playGame() {
     bSplitTurn = false;
     bStay = false;
     playerWon = false;
+    playerWonSplit = false;
     tie = false;
     playerTurn2 = false;
 
@@ -65,11 +68,13 @@ bool game::playGame() {
             if (bSplit)
             {
                 bStay = false;
-                while (((playerCardTotalLowSplit < 21)) && (!bStay) && (!playerBust))
+                playerCardTotalLowSplit = playerHandSplit[0];
+                playerCardTotalHighSplit = playerHandSplit[0];
+                while (((playerCardTotalLowSplit < 21)) && (!bStay) && (!playerBustSplit))
                 {
                     bSplitTurn = true;
                     //print here and get user input
-                    console.gameUI(GAMEUI, playerCardTotalHighSplit, playerCardTotalLowSplit,
+                    console.gameUI(GAMEUI, playerCardTotalHigh, playerCardTotalLow,
                                    dealerCardTotalHigh, dealerCardTotalLow,
                                    playerHand, dealerHand, playerHandSplit,
                                    bSplitTurn, playerCardTotalHighSplit, playerCardTotalLowSplit);
@@ -79,7 +84,7 @@ bool game::playGame() {
 
 
             }
-            if (!playerBust) //If user did not bust
+            if (!playerBust || !playerBustSplit) //If user did not bust
             {
                 dealerTurn();
             }
@@ -95,7 +100,7 @@ bool game::playGame() {
             payPlayer();
 
         }
-        console.displayResults(dealerBestHand, playerBestHand, (playerWon||tie));
+        console.displayResults(dealerBestHand, playerBestHand, playerBestHandSplit, (playerWon||tie||playerWonSplit), bSplit);
         cout << "\nContinue? (Y/N): ";
         cin >> dummyString;
         //replace
@@ -165,7 +170,7 @@ void game::initialDeal() {
     cout << "Dealer card 1: " << dealerHand[0] << endl;
     cout << "Dealer card 2: " << dealerHand[1] << endl;
 #endif
-    //this is for testing, please remove
+    //this is for testing, please remove later
 #ifdef TESTING2
     playerHand[0] = 10;
     playerHand[1] = 10;
@@ -430,7 +435,7 @@ void game::playerTurn() {
 
                     case STAY:
                         bStay = true;
-                        hideDealerCard2 = false;
+                        //hideDealerCard2 = false;
                         break;
 #ifdef DoubleDown
                     case DOUBLEDOWN:
@@ -455,14 +460,18 @@ void game::playerTurn() {
                         if (!bSplit) {
                             if (playerHand[0] == playerHand[1]) {
                                 if (!playerTurn2) {
-                                    bSplit = true;
-                                    tempHand1 = playerHand[0];
-                                    playerHand.clear();
-                                    playerHandSplit.clear();
-                                    playerHand.push_back(tempHand1);
-                                    playerHandSplit.push_back(tempHand1);
-                                    playerCardTotalLow = playerHand[0];
-                                    playerCardTotalHigh = playerHand[0];
+                                    if (chipBalance >= playerBet) {
+                                        bSplit = true;
+                                        tempHand1 = playerHand[0];
+                                        playerHand.clear();
+                                        playerHandSplit.clear();
+                                        playerHand.push_back(tempHand1);
+                                        playerHandSplit.push_back(tempHand1);
+                                        playerCardTotalLow = playerHand[0];
+                                        playerCardTotalHigh = playerHand[0];
+                                        chipBalance = chipBalance - playerBet;
+                                        //playerBet += playerBet;
+                                    }
                                 } else {
                                     cout << "CANNOT SPLIT" << endl;
                                 }
@@ -493,7 +502,7 @@ void game::dealerTurn() {
         dealerBlackJack = true;
     }
     else {
-        while ((dealerCardTotalHigh < 17 && (dealerCardTotalHigh <= playerBestHand)) && !dealerBust) {
+        while ((dealerCardTotalHigh < 17) && ((dealerCardTotalHigh <= playerBestHand) || (dealerCardTotalHigh <= playerBestHandSplit)) && !dealerBust) {
             hit(DEALER);
             console.delayInSec(1);
             dealerBust = checkForBust(DEALER);
@@ -510,6 +519,10 @@ void game::dealerTurn() {
             console.bust(DEALER);
             calculateWinner(); //for math-ing
             playerWon = true;
+            if (bSplit)
+            {
+                playerWonSplit = true;
+            }
         } else {
             calculateWinner();
         }
@@ -517,11 +530,7 @@ void game::dealerTurn() {
 }
 
 void game::payPlayer() {
-    if (tie)
-    {
-        chipBalance += playerBet;
-    }
-    else if (playerBlackJack && dealerBlackJack)
+    if (playerBlackJack && dealerBlackJack)
     {
         chipBalance += playerBet;
     }
@@ -529,7 +538,24 @@ void game::payPlayer() {
     {
         chipBalance += (playerBet * 3); //tripple players bet
     }
-    else if (playerWon)
+    else if (bSplit) //Checks if player split their hand
+    {
+        if (tie)
+        {
+            chipBalance += playerBet;
+        }
+        if (playerWon && playerWonSplit)
+        {
+            chipBalance += (playerBet * 2); //double players bet
+        } else if (playerWon)
+        {
+            chipBalance += (playerBet);
+        } else if (playerWonSplit)
+        {
+            chipBalance += (playerBet);
+        }
+    }
+    else if (playerWon) //non-split hand check
     {
         chipBalance += (playerBet * 2); //double players bet
     }
@@ -543,6 +569,15 @@ void game::calculateWinner() {
     } else{
         playerBestHand = playerCardTotalLow;
     }
+    if (bSplit)
+    {
+        if (playerCardTotalHighSplit <= 21)
+        {
+            playerBestHandSplit = playerCardTotalHighSplit;
+        } else{
+            playerBestHandSplit = playerCardTotalLowSplit;
+        }
+    }
     //////////////////////////////////////////
     if (dealerCardTotalHigh <= 21)
     {
@@ -551,15 +586,31 @@ void game::calculateWinner() {
         dealerBestHand = dealerCardTotalLow;
     }
     //////////////////////////////////////////
-    if (playerBestHand == dealerBestHand)
+    if (bSplit) //if player split their hand
     {
-        tie = true;
+        if ((playerBestHand == dealerBestHand) || (playerBestHandSplit == dealerBestHand))
+        {
+            tie = true;
+        }
+        else
+        {
+            if (playerBestHand > dealerBestHand)
+            {
+                playerWon = true;
+            }
+            if (playerBestHandSplit > dealerBestHand)
+            {
+                playerWonSplit = true;
+            }
+        }
     }
-    else if (playerBestHand > dealerBestHand)
-    {
-        playerWon = true;
-    } else {
-        playerWon = false;
+    else { //non split
+        if (playerBestHand == dealerBestHand) {
+            tie = true;
+        } else if (playerBestHand > dealerBestHand) {
+            playerWon = true;
+        }
     }
+
 
 }

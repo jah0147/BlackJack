@@ -61,9 +61,11 @@ private:
     int dealerCardTotalLow = 0;
 
     int playerBestHand = 0;
+    int playerBestHandSplit = 0;
     int dealerBestHand = 0;
 
     bool playerBust = false;
+    bool playerBustSplit = false;
     bool dealerBust = false;
     bool playerBlackJack = false;
     bool dealerBlackJack = false;
@@ -71,6 +73,7 @@ private:
     bool bSplitTurn = false;
     bool bStay = false;
     bool playerWon = false;
+    bool playerWonSplit = false;
     bool tie = false;
 
     bool playerTurn2 = false;

@@ -56,7 +56,8 @@ bool game::playGame() {
                 //print here and get user input
                 console.gameUI(GAMEUI, playerCardTotalHigh, playerCardTotalLow,
                                         dealerCardTotalHigh, dealerCardTotalLow,
-                                        playerHand, dealerHand);
+                                        playerHand, dealerHand, playerHandSplit,
+                               bSplitTurn, playerCardTotalHighSplit, playerCardTotalLowSplit);
 
                 playerTurn();
                 playerTurn2 = true;
@@ -70,7 +71,8 @@ bool game::playGame() {
                     //print here and get user input
                     console.gameUI(GAMEUI, playerCardTotalHighSplit, playerCardTotalLowSplit,
                                    dealerCardTotalHigh, dealerCardTotalLow,
-                                   playerHand, dealerHand);
+                                   playerHand, dealerHand, playerHandSplit,
+                                   bSplitTurn, playerCardTotalHighSplit, playerCardTotalLowSplit);
 
                     playerTurn();
                 }
@@ -163,6 +165,11 @@ void game::initialDeal() {
     cout << "Dealer card 1: " << dealerHand[0] << endl;
     cout << "Dealer card 2: " << dealerHand[1] << endl;
 #endif
+    //this is for testing, please remove
+#ifdef TESTING2
+    playerHand[0] = 10;
+    playerHand[1] = 10;
+#endif
 }
 
 int game::caclulateCardTotal(int highLow,vector<int> hand) {
@@ -241,7 +248,7 @@ unsigned int game::dealCard() {
 }
 
 void game::bet() {
-    console.gameUI(BET, 0, 0, 0, 0, playerHand, dealerHand); //playerhand and dealerhand are not used here but included to satisfy args
+    console.gameUI(BET, 0, 0, 0, 0, playerHand, dealerHand, playerHandSplit); //playerhand and dealerhand are not used here but included to satisfy args
     cout << "\nBet: ";
     cin >> playerBetTemp;
 
@@ -285,7 +292,8 @@ void game::hit(int who) {
                 playerCardTotalLow = caclulateCardTotal(LOW, playerHand);
                 console.gameUI(GAMEUI,
                                playerCardTotalHigh, playerCardTotalLow,
-                               dealerCardTotalHigh, dealerCardTotalLow, playerHand, dealerHand);
+                               dealerCardTotalHigh, dealerCardTotalLow, playerHand, dealerHand, playerHandSplit,
+                               bSplitTurn, playerCardTotalHighSplit, playerCardTotalLowSplit);
             } else
             { //if we are on split hand
                 playerHandSplit.push_back(card);
@@ -293,7 +301,8 @@ void game::hit(int who) {
                 playerCardTotalLowSplit = caclulateCardTotal(LOW, playerHandSplit);
                 console.gameUI(GAMEUI,
                                playerCardTotalHighSplit, playerCardTotalLowSplit,
-                               dealerCardTotalHigh, dealerCardTotalLow, playerHandSplit, dealerHand);
+                               dealerCardTotalHigh, dealerCardTotalLow, playerHandSplit, dealerHand, playerHandSplit,
+                               bSplitTurn, playerCardTotalHighSplit, playerCardTotalLowSplit);
             }
             break;
         case DEALER:
@@ -302,12 +311,14 @@ void game::hit(int who) {
             dealerCardTotalLow = caclulateCardTotal(LOW, dealerHand);
             console.gameUI(GAMEUI,
                            playerCardTotalHigh, playerCardTotalLow,
-                           dealerCardTotalHigh, dealerCardTotalLow, playerHand, dealerHand);
+                           dealerCardTotalHigh, dealerCardTotalLow, playerHand, dealerHand, playerHandSplit,
+                           bSplitTurn, playerCardTotalHighSplit, playerCardTotalLowSplit);
             if (bSplit)
             {
                 console.gameUI(GAMEUI,
                                playerCardTotalHighSplit, playerCardTotalLowSplit,
-                               dealerCardTotalHigh, dealerCardTotalLow, playerHandSplit, dealerHand);
+                               dealerCardTotalHigh, dealerCardTotalLow, playerHandSplit, dealerHand, playerHandSplit,
+                               bSplitTurn, playerCardTotalHighSplit, playerCardTotalLowSplit);
             }
             break;
 
@@ -450,6 +461,8 @@ void game::playerTurn() {
                                     playerHandSplit.clear();
                                     playerHand.push_back(tempHand1);
                                     playerHandSplit.push_back(tempHand1);
+                                    playerCardTotalLow = playerHand[0];
+                                    playerCardTotalHigh = playerHand[0];
                                 } else {
                                     cout << "CANNOT SPLIT" << endl;
                                 }
@@ -473,7 +486,8 @@ void game::dealerTurn() {
     hideDealerCard2 = false;
     console.gameUI(GAMEUI, playerCardTotalHigh, playerCardTotalLow,
                    dealerCardTotalHigh, dealerCardTotalLow,
-                   playerHand, dealerHand);
+                   playerHand, dealerHand, playerHandSplit,
+                   bSplitTurn, playerCardTotalHighSplit, playerCardTotalLowSplit);
     if (dealerCardTotalHigh == 21)
     {
         dealerBlackJack = true;

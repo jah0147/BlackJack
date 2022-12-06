@@ -23,9 +23,10 @@ public:
     void gameUI(int UI,
                 int playerTotalHigh, int playerTotalLow,
                 int dealerTotalHigh, int dealerTotalLow,
-                vector<int> playerHand, vector<int> dealerHand);
+                vector<int> playerHand, vector<int> dealerHand, vector<int> playerHandSplit,
+                bool split = false, int playerTotalHighSplit = 0, int playerTotalLowSplit = 0); //default values so we do not always have to use them
     void bust(int who);
-    void displayResults(int dealerTotal, int playerTotal, bool won);
+    void displayResults(int dealerTotal, int playerTotal, int playerTotalSplit = 0, bool won = false, bool split = false);
     void clearConsole();
     void delayInSec(int seconds);
 

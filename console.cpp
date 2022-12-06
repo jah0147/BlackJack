@@ -114,7 +114,8 @@ void console::bust(int who)
 void console::gameUI(int UI,
                      int playerTotalHigh, int playerTotalLow,
                      int dealerTotalHigh, int dealerTotalLow,
-                     vector<int> playerHand, vector<int> dealerHand)
+                     vector<int> playerHand, vector<int> dealerHand, vector<int> playerHandSplit,
+                     bool split, int playerTotalHighSplit, int playerTotalLowSplit)
 {
     switch (UI)
     {
@@ -131,65 +132,97 @@ void console::gameUI(int UI,
 #ifdef ClearConsole
             clearConsole();
 #endif
-            cout << "===================================================================" << endl;
-            cout << "Dealers Hand: ";
-            if (hideDealerCard2) { //this value is changed outside the class
-                cout << " ";
-                cout << "[" << dealerHand[0] << "] ";
-                cout << "[*]";
-                cout << endl;
-            } else {
-                for (int i = 0; i < dealerHand.size(); i++)
-                {
+
+                cout << "===================================================================" << endl;
+                cout << "Dealers Hand: ";
+                if (hideDealerCard2) { //this value is changed outside the class
                     cout << " ";
-                    cout << "[" << dealerHand[i] << "]";
+                    cout << "[" << dealerHand[0] << "] ";
+                    cout << "[*]";
+                    cout << endl;
+                } else {
+                    for (int i = 0; i < dealerHand.size(); i++) {
+                        cout << " ";
+                        cout << "[" << dealerHand[i] << "]";
+                    }
+                    //spacing
+                    cout << endl;
+                    cout << endl;
+                    if (dealerTotalHigh == dealerTotalLow) {
+                        cout << "Dealers card total: " << dealerTotalHigh << endl;
+                    } else if (dealerTotalHigh <= 21) {
+                        cout << "Dealers card total: " << dealerTotalHigh << " or " << dealerTotalLow << endl;
+                    } else {
+                        cout << "Dealers card total: " << dealerTotalLow << endl;
+                    }
                 }
                 //spacing
-                cout << endl;
-                cout << endl;
-                if (dealerTotalHigh == dealerTotalLow) {
-                    cout << "Dealers card total: " << dealerTotalHigh << endl;
+                cout << "" << endl;
+                cout << "-------------------------------------------------------------------" << endl;
+                cout << "" << endl;
+
+            if (!split) { //Regular UI when we are not using the split hand
+                cout << "Your Hand: ";
+                for (int i = 0; i < playerHand.size(); i++) {
+                    cout << " ";
+                    cout << "[" << playerHand[i] << "]";
                 }
-                else if (dealerTotalHigh <= 21) {
-                    cout << "Dealers card total: " << dealerTotalHigh << " or " << dealerTotalLow << endl;
+                //spacing
+                cout << "" << endl;
+                cout << "" << endl;
+
+                if (playerTotalHigh == playerTotalLow) {
+                    cout << "Your card total: " << playerTotalHigh;
+                } else if (playerTotalHigh <= 21) {
+                    cout << "Your card total: " << playerTotalHigh << " or " << playerTotalLow << endl;
                 } else {
-                    cout << "Dealers card total: " << dealerTotalLow << endl;
+                    cout << "Your card total: " << playerTotalLow;
                 }
+                cout << endl;
+                cout << "\nChip Balance: " << chipBalance << endl;
+                cout << "===================================================================" << endl;
+                break;
             }
-            //spacing
-            cout << "" << endl;
-            cout << "-------------------------------------------------------------------" << endl;
-            cout << "" << endl;
-
-            cout << "Your Hand: ";
-            for (int i = 0; i < playerHand.size(); i++)
+            else //If we are on the split hand
             {
-                cout << " ";
-                cout << "[" << playerHand[i] << "]";
-            }
-            //spacing
-            cout << "" << endl;
-            cout << ""<< endl;
+                if (playerTotalHigh == playerTotalLow) {
+                    cout << "Your previous card total: " << playerTotalHigh;
+                } else if (playerTotalHigh <= 21) {
+                    cout << "Your previous card total: " << playerTotalHigh << " or " << playerTotalLow << endl;
+                } else {
+                    cout << "Your previous card total: " << playerTotalLow;
+                }
+                //spacing
+                cout << "" << endl;
+                cout << "" << endl;
+                cout << "Your Hand: ";
+                for (int i = 0; i < playerHandSplit.size(); i++) {
+                    cout << " ";
+                    cout << "[" << playerHandSplit[i] << "]";
+                }
+                //spacing
+                cout << "" << endl;
+                cout << "" << endl;
 
-            if (playerTotalHigh == playerTotalLow) {
-                cout << "Your card total: " << playerTotalHigh;
+                if (playerTotalHighSplit == playerTotalLowSplit) {
+                    cout << "Your card total: " << playerTotalHighSplit;
+                } else if (playerTotalHighSplit <= 21) {
+                    cout << "Your card total: " << playerTotalHighSplit << " or " << playerTotalLowSplit << endl;
+                } else {
+                    cout << "Your card total: " << playerTotalLowSplit;
+                }
+                cout << endl;
+                cout << "\nChip Balance: " << chipBalance << endl;
+                cout << "===================================================================" << endl;
+                break;
             }
-            else if (playerTotalHigh <= 21) {
-                cout << "Your card total: " << playerTotalHigh << " or " << playerTotalLow << endl;
-            } else {
-                cout << "Your card total: " << playerTotalLow;
-            }
-            cout << endl;
-            cout <<  "\nChip Balance: " << chipBalance << endl;
-            cout << "===================================================================" << endl;
-            break;
         default:
             cout << "[ERROR] In game UI" << endl;
             break;
     }
 }
 
-void console::displayResults(int dealerTotal, int playerTotal, bool won)
+void console::displayResults(int dealerTotal, int playerTotal, int playerTotalSplit, bool won, bool split)
 {
 //#ifdef ClearConsole
 //    clearConsole();
@@ -197,7 +230,15 @@ void console::displayResults(int dealerTotal, int playerTotal, bool won)
     cout << "===================================================================" << endl;
     cout << "                DEALERS CARD TOTAL: " << dealerTotal << endl;
     cout << endl;
-    cout << "                 YOUR CARD TOTAL: " << playerTotal << endl;
+    if (split)
+    {
+        cout << "                 YOUR CARD TOTAL 1: " << playerTotal << endl;
+        cout << "                 YOUR CARD TOTAL 2: " << playerTotalSplit << endl;
+    }
+    else
+    {
+        cout << "                 YOUR CARD TOTAL: " << playerTotal << endl;
+    }
     cout << "===================================================================" << endl;
     cout << endl;
     if (won) {

@@ -588,12 +588,16 @@ void game::calculateWinner() {
     //////////////////////////////////////////
     if (bSplit) //if player split their hand
     {
-        if ((playerBestHand == dealerBestHand) || (playerBestHandSplit == dealerBestHand))
+        if ((playerBestHand == dealerBestHand) && (playerBestHandSplit == dealerBestHand))
         {
-            tie = true;
+            playerWon = true; //this is set so the correct amount gets paid to the player if they end up with a tie for both hands
         }
         else
         {
+            if (playerBestHand == dealerBestHand || playerBestHandSplit == dealerBestHand)
+            {
+                tie = true;
+            }
             if (playerBestHand > dealerBestHand)
             {
                 playerWon = true;

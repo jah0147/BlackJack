@@ -257,7 +257,7 @@ void game::bet() {
     cout << "\nBet: ";
     cin >> playerBetTemp;
 
-    if ((playerBetTemp%10) != 0) //If user bet is not an increment of 10
+    if ((playerBetTemp%10) != 0 || (playerBetTemp == 0)) //If user bet is not an increment of 10 or bets zero
     {
         cout << "Please only bet in increments of 10!" << endl;
         cout << "Please try again..." << endl;
@@ -430,7 +430,13 @@ void game::playerTurn() {
                 switch (userInput) {
                     case HIT:
                         hit(PLAYER);
-                        playerBust = checkForBust(PLAYER); //check if bust
+                        if (bSplitTurn)
+                        {
+                            playerBustSplit = checkForBust(PLAYER); //check if bust
+                        }
+                        else {
+                            playerBust = checkForBust(PLAYER); //check if bust
+                        }
                         break;
 
                     case STAY:
@@ -502,12 +508,12 @@ void game::dealerTurn() {
         dealerBlackJack = true;
     }
     else {
-        while ((dealerCardTotalHigh < 17) && ((dealerCardTotalHigh <= playerBestHand) || (dealerCardTotalHigh <= playerBestHandSplit)) && !dealerBust) {
+        while ((dealerCardTotalHigh < 17) && ((dealerCardTotalHigh < playerBestHand) || (dealerCardTotalHigh < playerBestHandSplit)) && !dealerBust) {
             hit(DEALER);
             console.delayInSec(1);
             dealerBust = checkForBust(DEALER);
         }
-        if (dealerCardTotalHigh > 21)
+        if (dealerCardTotalHigh > 21 && dealerCardTotalLow < 17)
         {
             while (dealerCardTotalLow < 17) {
                 hit(DEALER);
@@ -558,6 +564,10 @@ void game::payPlayer() {
     else if (playerWon) //non-split hand check
     {
         chipBalance += (playerBet * 2); //double players bet
+    }
+    else if (tie)
+    {
+        chipBalance += playerBet;
     }
 }
 
@@ -613,6 +623,9 @@ void game::calculateWinner() {
             tie = true;
         } else if (playerBestHand > dealerBestHand) {
             playerWon = true;
+        } else {
+            playerWon = false;
+            tie = false;
         }
     }
 

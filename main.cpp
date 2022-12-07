@@ -17,10 +17,5 @@ int main() {
     while (Continue) {
         Continue = game.playGame();
     }
-#ifdef TESTING
-    int userIn;
-    cout << "Press Enter to end game";
-    cin >> userIn;
-#endif
     return 0;
 }

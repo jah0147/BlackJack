@@ -41,9 +41,7 @@ bool game::playGame() {
         bet();
         initialDeal();
         playerCardTotalHigh = caclulateCardTotal(HIGH, playerHand);
-        //playerCardTotalHighSplit = caclulateCardTotal(HIGH, playerHand);
         playerCardTotalLow = caclulateCardTotal(LOW, playerHand);
-        //playerCardTotalLowSplit = caclulateCardTotal(LOW, playerHandSplit);
         dealerCardTotalHigh = caclulateCardTotal(HIGH, dealerHand);
         dealerCardTotalLow = caclulateCardTotal(LOW, dealerHand);
 
@@ -351,6 +349,7 @@ bool game::checkForBust(int who) {
                 if (playerCardTotalHigh > 21) {
                     if (playerCardTotalLow > 21) {
                         bust = true;
+                        playerCardTotalLow = 0;
                     } else {
                         bust = false;
                     }
@@ -366,6 +365,7 @@ bool game::checkForBust(int who) {
                 if (playerCardTotalHighSplit > 21) {
                     if (playerCardTotalLowSplit > 21) {
                         bust = true;
+                        playerCardTotalLowSplit = 0;
                     } else {
                         bust = false;
                     }
@@ -561,13 +561,13 @@ void game::payPlayer() {
             chipBalance += (playerBet);
         }
     }
-    else if (playerWon) //non-split hand check
-    {
-        chipBalance += (playerBet * 2); //double players bet
-    }
     else if (tie)
     {
         chipBalance += playerBet;
+    }
+    else if (playerWon) //non-split hand check
+    {
+        chipBalance += (playerBet * 2); //double players bet
     }
 }
 

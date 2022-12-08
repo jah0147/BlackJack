@@ -1,4 +1,3 @@
-#include <iostream>
 #include "config.h"
 #include "console.h"
 #include "game.h"
